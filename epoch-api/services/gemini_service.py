@@ -1,12 +1,17 @@
 import os
 from google import genai
 
-def summarize_news(country: str, headlines: list) -> str:
+def summarize_news(country: str, headlines) -> str:
+    # Handle both old format (list of strings) and new format (list of dicts)
+    if headlines and isinstance(headlines[0], dict):
+        headline_titles = [h.get("title", "") for h in headlines if h.get("title")]
+    else:
+        headline_titles = [h for h in headlines if isinstance(h, str)]
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("GEMINI_API_KEY not set in environment variables")
     
-    headlines_text = "\n".join(f"- {h}" for h in headlines)
+    headlines_text = "\n".join(f"- {h}" for h in headline_titles)
     
     prompt = f"""You are a calm, authoritative live news anchor broadcasting to a global audience.
 Summarize these recent headlines about {country} in exactly 3-4 sentences.
