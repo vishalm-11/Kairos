@@ -1,0 +1,77 @@
+import { useState } from 'react'
+import Globe from './components/Globe'
+import CountryPanel from './components/CountryPanel'
+import LoadingOverlay from './components/LoadingOverlay'
+import { getCountryData } from './lib/api'
+
+export default function App() {
+  const [selectedCountry, setSelectedCountry] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
+
+  const handleCountryClick = async (countryName) => {
+    if (loading) return
+    setLoading(true)
+    setError(null)
+    setSelectedCountry(null)
+    try {
+      const data = await getCountryData(countryName)
+      setSelectedCountry(data)
+    } catch (e) {
+      setError(`Could not load data for ${countryName}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div style={{ width: '100vw', height: '100vh', position: 'relative', background: '#030712' }}>
+      {/* Top bar */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
+        padding: '20px 28px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: 'linear-gradient(to bottom, rgba(3,7,18,0.9) 0%, transparent 100%)',
+        pointerEvents: 'none'
+      }}>
+        <div>
+          <div style={{ fontFamily: 'Bebas Neue', fontSize: '2rem', letterSpacing: '0.1em', color: '#F59E0B' }}>
+            EPOCH
+          </div>
+          <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: '#6B7280', letterSpacing: '0.2em', marginTop: '-4px' }}>
+            WORLD EVENTS IN REAL TIME
+          </div>
+        </div>
+        <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: '#6B7280', letterSpacing: '0.15em' }}>
+          CLICK ANY COUNTRY
+        </div>
+      </div>
+
+      {/* Globe */}
+      <Globe onCountryClick={handleCountryClick} />
+
+      {/* Loading */}
+      {loading && <LoadingOverlay />}
+
+      {/* Error */}
+      {error && (
+        <div style={{
+          position: 'absolute', bottom: 28, left: '50%', transform: 'translateX(-50%)',
+          background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)',
+          color: '#FCA5A5', padding: '10px 20px', borderRadius: '6px',
+          fontFamily: 'JetBrains Mono', fontSize: '0.75rem', zIndex: 20
+        }}>
+          {error}
+        </div>
+      )}
+
+      {/* Country Panel */}
+      {selectedCountry && (
+        <CountryPanel
+          data={selectedCountry}
+          onClose={() => setSelectedCountry(null)}
+        />
+      )}
+    </div>
+  )
+}
