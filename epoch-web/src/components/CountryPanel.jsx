@@ -5,14 +5,19 @@ export default function CountryPanel({ data, onClose }) {
   const [isPlaying, setIsPlaying] = useState(false)
 
   useEffect(() => {
-    if (data.audio_base64) {
-      const audio = new Audio(`data:audio/mpeg;base64,${data.audio_base64}`)
-      audioRef.current = audio
-      audio.onplay = () => setIsPlaying(true)
-      audio.onended = () => setIsPlaying(false)
-      audio.onpause = () => setIsPlaying(false)
-      audio.play().catch(() => {})
-    }
+    if (!data?.audio_base64) return
+    
+    const audio = new Audio(`data:audio/mpeg;base64,${data.audio_base64}`)
+    audioRef.current = audio
+    audio.onplay = () => setIsPlaying(true)
+    audio.onended = () => setIsPlaying(false)
+    audio.onpause = () => setIsPlaying(false)
+    
+    // Auto-play audio on mount
+    audio.play().catch((e) => {
+      console.error('Audio play failed:', e)
+    })
+    
     return () => {
       if (audioRef.current) {
         audioRef.current.pause()
@@ -176,35 +181,75 @@ export default function CountryPanel({ data, onClose }) {
           LATEST HEADLINES
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {data.headlines.map((headline, i) => (
-            <div key={i} style={{
-              padding: '12px 14px',
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.06)',
-              borderRadius: '6px',
-              display: 'flex',
-              gap: '12px',
-              alignItems: 'flex-start',
-            }}>
-              <span style={{
-                fontFamily: 'JetBrains Mono',
-                fontSize: '0.6rem',
-                color: '#F59E0B',
-                flexShrink: 0,
-                marginTop: '2px',
-              }}>
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <span style={{
-                fontFamily: 'DM Sans',
-                fontSize: '0.82rem',
-                lineHeight: 1.5,
-                color: 'rgba(249,250,251,0.75)',
-              }}>
-                {headline}
-              </span>
-            </div>
-          ))}
+          {data.headlines.map((headline, i) => {
+            const headlineText = typeof headline === 'string' ? headline : headline.title || headline
+            const headlineUrl = typeof headline === 'object' ? headline.url : null
+            
+            return (
+              <div key={i} style={{
+                padding: '12px 14px',
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: '6px',
+                display: 'flex',
+                gap: '12px',
+                alignItems: 'flex-start',
+                transition: 'all 0.2s ease',
+                cursor: headlineUrl ? 'pointer' : 'default',
+              }}
+              onClick={() => {
+                if (headlineUrl) {
+                  window.open(headlineUrl, '_blank', 'noopener,noreferrer')
+                }
+              }}
+              onMouseEnter={(e) => {
+                if (headlineUrl) {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.06)'
+                  e.currentTarget.style.borderColor = 'rgba(245,158,11,0.3)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (headlineUrl) {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'
+                }
+              }}
+              >
+                <span style={{
+                  fontFamily: 'JetBrains Mono',
+                  fontSize: '0.6rem',
+                  color: '#F59E0B',
+                  flexShrink: 0,
+                  marginTop: '2px',
+                }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div style={{ flex: 1 }}>
+                  <span style={{
+                    fontFamily: 'DM Sans',
+                    fontSize: '0.82rem',
+                    lineHeight: 1.5,
+                    color: headlineUrl ? 'rgba(245,158,11,0.9)' : 'rgba(249,250,251,0.75)',
+                    textDecoration: headlineUrl ? 'underline' : 'none',
+                    textUnderlineOffset: '2px',
+                  }}>
+                    {headlineText}
+                  </span>
+                  {headlineUrl && (
+                    <div style={{
+                      fontFamily: 'JetBrains Mono',
+                      fontSize: '0.55rem',
+                      color: '#6B7280',
+                      marginTop: '4px',
+                      opacity: 0.7,
+                    }}>
+                      Click to read →
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>

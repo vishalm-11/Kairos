@@ -2,26 +2,39 @@ import { useState } from 'react'
 import Globe from './components/Globe'
 import CountryPanel from './components/CountryPanel'
 import LoadingOverlay from './components/LoadingOverlay'
+import LandingPage from './components/LandingPage'
 import { getCountryData } from './lib/api'
 
 export default function App() {
+  const [showGlobe, setShowGlobe] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
   const handleCountryClick = async (countryName) => {
     if (loading) return
+    console.log('handleCountryClick called with:', countryName)
     setLoading(true)
     setError(null)
     setSelectedCountry(null)
     try {
+      console.log('Fetching country data for:', countryName)
       const data = await getCountryData(countryName)
+      console.log('Country data received:', data)
       setSelectedCountry(data)
     } catch (e) {
-      setError(`Could not load data for ${countryName}`)
+      console.error('Error fetching country data:', e)
+      const errorMessage = e.response?.data?.detail || e.message || 'Unknown error'
+      setError(`Could not load data for ${countryName}: ${errorMessage}`)
+      console.error('Full error:', e.response?.data || e)
     } finally {
       setLoading(false)
     }
+  }
+
+  // Show landing page first
+  if (!showGlobe) {
+    return <LandingPage onEnter={() => setShowGlobe(true)} />
   }
 
   return (
@@ -51,7 +64,11 @@ export default function App() {
       <Globe onCountryClick={handleCountryClick} />
 
       {/* Loading */}
-      {loading && <LoadingOverlay />}
+      {loading && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 15 }}>
+          <LoadingOverlay />
+        </div>
+      )}
 
       {/* Error */}
       {error && (
