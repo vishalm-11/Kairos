@@ -37,7 +37,7 @@ def _fetch_newsapi(country: str) -> List[Dict[str, str]]:
             params={
                 "q": query,
                 "sortBy": "publishedAt",
-                "pageSize": 10,  # Fetch more to filter better
+                "pageSize": 20,  # Fetch more to ensure we get 5 good results after filtering
                 "language": "en",
                 "apiKey": key,
                 "searchIn": "title,description"
@@ -78,14 +78,14 @@ def _fetch_newsapi(country: str) -> List[Dict[str, str]]:
                     break
         
         # If we don't have enough relevant results, fall back to broader search
-        if len(result) < 3:
+        if len(result) < 5:
             query_fallback = f'"{country}" AND (conflict OR crisis OR diplomacy OR foreign OR international OR government OR politics)'
             r2 = requests.get(
                 "https://newsapi.org/v2/everything",
                 params={
                     "q": query_fallback,
                     "sortBy": "publishedAt",
-                    "pageSize": 5,
+                    "pageSize": 15,  # Fetch more to ensure we get 5 results
                     "language": "en",
                     "apiKey": key,
                 },
@@ -101,7 +101,8 @@ def _fetch_newsapi(country: str) -> List[Dict[str, str]]:
                     if len(result) >= 5:
                         break
         
-        return result[:5]
+        # Ensure we return between 3 and 5 headlines
+        return result[:5] if len(result) >= 3 else result
     except Exception as e:
         print(f"NewsAPI error: {e}")
         return []
@@ -110,7 +111,7 @@ def _fetch_gdelt(country: str) -> List[Dict[str, str]]:
     try:
         r = requests.get(
             f"https://api.gdeltproject.org/api/v2/doc/doc",
-            params={"query": country, "mode": "artlist", "maxrecords": 5, "format": "json"},
+            params={"query": country, "mode": "artlist", "maxrecords": 10, "format": "json"},
             timeout=5
         )
         data = r.json()
@@ -121,7 +122,10 @@ def _fetch_gdelt(country: str) -> List[Dict[str, str]]:
             url = a.get("url") or a.get("seendate")
             if title:
                 result.append({"title": title, "url": url})
-        return result[:5]
+                if len(result) >= 5:
+                    break
+        # Ensure we return between 3 and 5 headlines
+        return result[:5] if len(result) >= 3 else result
     except Exception as e:
         print(f"GDELT error: {e}")
         return []

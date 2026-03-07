@@ -1,7 +1,7 @@
 import os
 from google import genai
 
-def summarize_news(country: str, headlines) -> str:
+def summarize_news(country: str, headlines, economics: dict = None) -> str:
     # Handle both old format (list of strings) and new format (list of dicts)
     if headlines and isinstance(headlines[0], dict):
         headline_titles = [h.get("title", "") for h in headlines if h.get("title")]
@@ -13,14 +13,22 @@ def summarize_news(country: str, headlines) -> str:
     
     headlines_text = "\n".join(f"- {h}" for h in headline_titles)
     
+    # Build economics context text if available
+    economics_text = ""
+    if economics:
+        if economics.get("currency") and economics["currency"].get("formatted"):
+            economics_text += f"\nCurrency: {economics['currency']['formatted']}"
+        if economics.get("stock") and economics["stock"].get("formatted"):
+            economics_text += f"\nMarkets: {economics['stock']['formatted']}"
+    
     prompt = f"""You are a calm, authoritative live news anchor broadcasting to a global audience.
-Summarize these recent headlines about {country} in exactly 3-4 sentences.
-Speak naturally and conversationally, as if reading live on air.
-Be factual, concise, and impactful. Do not use bullet points or markdown.
-Only return the spoken summary text — nothing else.
+Summarize the situation in {country} in exactly 3-4 sentences spoken naturally as if live on air.
+If economic data is provided, naturally weave one brief reference to it into your summary.
+Be factual, concise, and impactful. Do not use bullet points or markdown. Only return the spoken summary — nothing else.
 
 Headlines:
-{headlines_text}"""
+{headlines_text}
+{f"Economic Context:{economics_text}" if economics_text else ""}"""
 
     # Try different API versions and model names
     # Based on available models: gemini-2.5-flash is the latest stable model
