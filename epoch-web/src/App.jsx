@@ -2,9 +2,11 @@ import { useState } from 'react'
 import Globe from './components/Globe'
 import CountryPanel from './components/CountryPanel'
 import LoadingOverlay from './components/LoadingOverlay'
+import LandingPage from './components/LandingPage'
 import { getCountryData } from './lib/api'
 
 export default function App() {
+  const [showGlobe, setShowGlobe] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -30,6 +32,11 @@ export default function App() {
     }
   }
 
+  // Show landing page first
+  if (!showGlobe) {
+    return <LandingPage onEnter={() => setShowGlobe(true)} />
+  }
+
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', background: '#030712' }}>
       {/* Top bar */}
@@ -41,7 +48,7 @@ export default function App() {
         pointerEvents: 'none'
       }}>
         <div>
-          <div style={{ fontFamily: 'Bebas Neue', fontSize: '2rem', letterSpacing: '0.1em', color: '#F59E0B' }}>
+          <div style={{ fontFamily: 'Bebas Neue', fontSize: '2rem', letterSpacing: '0.1em', color: '#FFFFFF' }}>
             EPOCH
           </div>
           <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: '#6B7280', letterSpacing: '0.2em', marginTop: '-4px' }}>

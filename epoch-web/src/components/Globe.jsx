@@ -187,13 +187,13 @@ export default function Globe({ onCountryClick }) {
           show: true,
         })
         
-        // Middle glow layer (bright highlight)
+        // Middle glow layer (bright white highlight)
         viewer.entities.add({
           position: position,
           point: {
             pixelSize: 7,
-            color: Cesium.Color.fromCssColorString('#FFD700').withAlpha(0.4 * baseAlpha),
-            outlineColor: Cesium.Color.fromCssColorString('#FFD700').withAlpha(0.3 * baseAlpha),
+            color: Cesium.Color.fromCssColorString('#FFFFFF').withAlpha(0.4 * baseAlpha),
+            outlineColor: Cesium.Color.fromCssColorString('#FFFFFF').withAlpha(0.3 * baseAlpha),
             outlineWidth: 5,
             heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
             disableDepthTestDistance: 0,
@@ -202,13 +202,13 @@ export default function Globe({ onCountryClick }) {
           show: true,
         })
         
-        // Main marker (bright and prominent with fixed color)
+        // Main marker (white with black outline - X/iOS dark mode style)
         const entity = viewer.entities.add({
           position: position,
           point: {
             pixelSize: 6,
-            color: Cesium.Color.fromCssColorString('#F59E0B').withAlpha(baseAlpha), // Fixed amber color
-            outlineColor: Cesium.Color.fromCssColorString('#FFD700').withAlpha(0.7 * baseAlpha), // Gold highlight
+            color: Cesium.Color.fromCssColorString('#FFFFFF').withAlpha(baseAlpha), // White color
+            outlineColor: Cesium.Color.fromCssColorString('#000000').withAlpha(0.8 * baseAlpha), // Black outline
             outlineWidth: 5,
             heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
             disableDepthTestDistance: 0, // Enable depth testing - markers won't show through globe
@@ -217,8 +217,8 @@ export default function Globe({ onCountryClick }) {
           label: {
             text: name,
             font: '14px JetBrains Mono',
-            fillColor: Cesium.Color.fromCssColorString('#F59E0B').withAlpha(0.95),
-            outlineColor: Cesium.Color.fromCssColorString('#030712').withAlpha(0.8),
+            fillColor: Cesium.Color.fromCssColorString('#FFFFFF').withAlpha(0.95),
+            outlineColor: Cesium.Color.fromCssColorString('#000000').withAlpha(0.8),
             outlineWidth: 3,
             style: Cesium.LabelStyle.FILL_AND_OUTLINE,
             pixelOffset: new Cesium.Cartesian2(0, -30),
@@ -226,7 +226,7 @@ export default function Globe({ onCountryClick }) {
             heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
             scaleByDistance: new Cesium.NearFarScalar(1.5e7, 1.0, 8.0e7, 0.3),
             showBackground: true,
-            backgroundColor: Cesium.Color.fromCssColorString('#030712').withAlpha(0.7),
+            backgroundColor: Cesium.Color.fromCssColorString('#000000').withAlpha(0.7),
             backgroundPadding: new Cesium.Cartesian2(8, 4),
             verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
             show: false, // Hide labels by default
@@ -320,8 +320,8 @@ export default function Globe({ onCountryClick }) {
           if (hoveredEntity.point) {
             hoveredEntity.point.pixelSize = 10
             hoveredEntity.point.outlineWidth = 10
-            hoveredEntity.point.color = Cesium.Color.fromCssColorString('#F59E0B').withAlpha(1.0)
-            hoveredEntity.point.outlineColor = Cesium.Color.fromCssColorString('#FFD700').withAlpha(0.9)
+            hoveredEntity.point.color = Cesium.Color.fromCssColorString('#FFFFFF').withAlpha(1.0)
+            hoveredEntity.point.outlineColor = Cesium.Color.fromCssColorString('#000000').withAlpha(0.9)
           }
         } else {
           viewer.canvas.style.cursor = 'default'
@@ -334,8 +334,8 @@ export default function Globe({ onCountryClick }) {
               const baseAlpha = density > 5 ? 0.7 : density > 3 ? 0.85 : 1.0
               entity.point.pixelSize = 6
               entity.point.outlineWidth = 5
-              entity.point.color = Cesium.Color.fromCssColorString('#F59E0B').withAlpha(baseAlpha)
-              entity.point.outlineColor = Cesium.Color.fromCssColorString('#FFD700').withAlpha(0.6 * baseAlpha)
+              entity.point.color = Cesium.Color.fromCssColorString('#FFFFFF').withAlpha(baseAlpha)
+              entity.point.outlineColor = Cesium.Color.fromCssColorString('#000000').withAlpha(0.8 * baseAlpha)
             }
           })
         }

@@ -1,0 +1,40 @@
+{
+  "hash": "f38ed41d",
+  "configHash": "f657a440",
+  "lockfileHash": "e63a4001",
+  "browserHash": "86e4c2c7",
+  "optimized": {
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "0ec65c92",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "0082bb8d",
+      "needsInterop": true
+    },
+    "cesium": {
+      "src": "../../node_modules/cesium/Source/Cesium.js",
+      "file": "cesium.js",
+      "fileHash": "546cfd8f",
+      "needsInterop": false
+    },
+    "axios": {
+      "src": "../../node_modules/axios/index.js",
+      "file": "axios.js",
+      "fileHash": "b3db211c",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-QTVD6AVW": {
+      "file": "chunk-QTVD6AVW.js"
+    },
+    "chunk-PR4QN5HX": {
+      "file": "chunk-PR4QN5HX.js"
+    }
+  }
+}

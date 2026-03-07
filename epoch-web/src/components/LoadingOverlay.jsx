@@ -12,9 +12,9 @@ export default function LoadingOverlay() {
       gap: '14px',
     }}>
       <div style={{
-        background: 'rgba(10,15,26,0.95)',
+        background: 'rgba(0,0,0,0.95)',
         backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(245,158,11,0.2)',
+        border: '1px solid rgba(255,255,255,0.2)',
         borderRadius: '12px',
         padding: '24px 32px',
         display: 'flex',
@@ -26,14 +26,14 @@ export default function LoadingOverlay() {
         <div className="spin-slow" style={{
           width: '48px',
           height: '48px',
-          border: '3px solid rgba(245,158,11,0.15)',
-          borderTop: '3px solid #F59E0B',
+          border: '3px solid rgba(255,255,255,0.15)',
+          borderTop: '3px solid #FFFFFF',
           borderRadius: '50%',
         }} />
         <div style={{
           fontFamily: 'JetBrains Mono',
           fontSize: '0.7rem',
-          color: '#F59E0B',
+          color: '#FFFFFF',
           letterSpacing: '0.2em',
           textAlign: 'center',
         }}>
