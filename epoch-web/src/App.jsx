@@ -2,11 +2,9 @@ import { useState } from 'react'
 import Globe from './components/Globe'
 import CountryPanel from './components/CountryPanel'
 import LoadingOverlay from './components/LoadingOverlay'
-import LandingPage from './components/LandingPage'
 import { getCountryData } from './lib/api'
 
 export default function App() {
-  const [showGlobe, setShowGlobe] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -30,11 +28,6 @@ export default function App() {
     } finally {
       setLoading(false)
     }
-  }
-
-  // Show landing page first
-  if (!showGlobe) {
-    return <LandingPage onEnter={() => setShowGlobe(true)} />
   }
 
   return (
