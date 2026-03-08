@@ -17,6 +17,10 @@ async def get_country_data(country_name: str):
         # Fetch headlines first (fast)
         headlines = fetch_news(country_name)
         print(f"Headlines fetched: {len(headlines)} items")
+        print(f"Headlines content: {headlines}")
+        
+        # Filter out the "No recent news" fallback message for summary
+        valid_headlines = [h for h in headlines if h.get("title") and "No recent news available" not in h.get("title", "")]
         
         # Fetch economic data (can be slow, but acceptable)
         try:
@@ -28,8 +32,13 @@ async def get_country_data(country_name: str):
             print(traceback.format_exc())
             economics = {"currency_code": None, "currency": None, "stock": None}
         
-        # Extract just titles for Gemini summary
-        headline_titles = [h["title"] for h in headlines]
+        # Extract just titles for Gemini summary (use valid headlines only)
+        headline_titles = [h["title"] for h in valid_headlines if h.get("title")]
+        
+        # If no valid headlines, use a default message for summary
+        if not headline_titles:
+            headline_titles = [f"Recent news about {country_name}"]
+            print(f"WARNING: No valid headlines for summary, using default")
         
         # Run Gemini and ElevenLabs in parallel for speed
         loop = asyncio.get_event_loop()
@@ -54,6 +63,20 @@ async def get_country_data(country_name: str):
             summary
         )
         print(f"Audio generated: {len(audio_base64)} characters")
+        
+        # Ensure headlines is always a list and filter out fallback messages
+        if not headlines:
+            headlines = []
+        else:
+            # Remove any "No recent news" fallback messages
+            headlines = [h for h in headlines if h.get("title") and "No recent news available" not in h.get("title", "")]
+        
+        print(f"Final headlines being returned: {len(headlines)} items")
+        if headlines:
+            for i, h in enumerate(headlines):
+                print(f"  Headline {i+1}: {h.get('title', 'NO TITLE')[:60]}...")
+        else:
+            print(f"  WARNING: No valid headlines to return!")
         
         return {
             "country": country_name,

@@ -215,6 +215,53 @@ export default function CountryPanel({ data, onClose }) {
             </div>
           </div>
 
+          {/* Economic Pulse */}
+          {data.economics && (data.economics.currency || data.economics.stock) && (
+            <div style={{
+              margin: '0 28px 20px',
+              padding: '14px 16px',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              borderRadius: '8px',
+            }}>
+              <div style={{
+                fontFamily: 'JetBrains Mono',
+                fontSize: '0.6rem',
+                color: '#6B7280',
+                letterSpacing: '0.2em',
+                marginBottom: '10px',
+              }}>
+                ECONOMIC PULSE
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {data.economics.currency_code !== "USD" && data.economics.currency && data.economics.currency.formatted && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontFamily: 'DM Sans', fontSize: '0.8rem', color: '#6B7280' }}>
+                      Currency
+                    </span>
+                    <span style={{ fontFamily: 'JetBrains Mono', fontSize: '0.75rem', color: '#F9FAFB' }}>
+                      {data.economics.currency.formatted}
+                    </span>
+                  </div>
+                )}
+                {data.economics.stock && data.economics.stock.formatted && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontFamily: 'DM Sans', fontSize: '0.8rem', color: '#6B7280' }}>
+                      Markets
+                    </span>
+                    <span style={{
+                      fontFamily: 'JetBrains Mono',
+                      fontSize: '0.75rem',
+                      color: data.economics.stock.direction === 'up' ? '#44FF88' : '#EF4444',
+                    }}>
+                      {data.economics.stock.formatted}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Headlines */}
           <div style={{
             padding: '0 28px 28px',
@@ -230,9 +277,10 @@ export default function CountryPanel({ data, onClose }) {
               LATEST HEADLINES
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {data.headlines.map((headline, i) => {
-                const headlineText = typeof headline === 'string' ? headline : headline.title || headline
-                const headlineUrl = typeof headline === 'object' ? headline.url : null
+              {data.headlines && data.headlines.length > 0 ? (
+                data.headlines.map((headline, i) => {
+                  const headlineText = typeof headline === 'string' ? headline : (headline?.title || headline || '')
+                  const headlineUrl = typeof headline === 'object' && headline ? headline.url : null
                 
                 return (
                   <div key={i} style={{
@@ -298,7 +346,20 @@ export default function CountryPanel({ data, onClose }) {
                     </div>
                   </div>
                 )
-              })}
+                })
+              ) : (
+                <div style={{
+                  padding: '14px 16px',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '10px',
+                  fontFamily: 'DM Sans',
+                  fontSize: '0.82rem',
+                  color: 'rgba(249,250,251,0.75)',
+                }}>
+                  No headlines available at this time.
+                </div>
+              )}
             </div>
           </div>
         </div>
