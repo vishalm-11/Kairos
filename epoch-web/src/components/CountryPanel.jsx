@@ -1,5 +1,147 @@
 import { useEffect, useRef, useState } from 'react'
 
+// Article Preview Component
+const ArticlePreview = ({ headline, index }) => {
+  const [showPreview, setShowPreview] = useState(false)
+  const [previewPosition, setPreviewPosition] = useState('right')
+  const articleRef = useRef(null)
+  const headlineText = typeof headline === 'string' ? headline : (headline?.title || headline || '')
+  const headlineUrl = typeof headline === 'object' && headline ? headline.url : null
+  const headlineImage = typeof headline === 'object' && headline ? headline.image : null
+  const headlineDescription = typeof headline === 'object' && headline ? headline.description : null
+
+  const handleMouseEnter = () => {
+    if (headlineDescription && articleRef.current) {
+      const rect = articleRef.current.getBoundingClientRect()
+      const spaceRight = window.innerWidth - rect.right
+      // If there's not enough space on the right (280px + 12px margin), show on left
+      setPreviewPosition(spaceRight < 300 ? 'left' : 'right')
+      setShowPreview(true)
+    }
+  }
+
+  return (
+    <div 
+      ref={articleRef}
+      style={{
+        padding: '14px 16px',
+        background: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: '10px',
+        display: 'flex',
+        gap: '14px',
+        alignItems: 'flex-start',
+        transition: 'all 0.2s ease',
+        cursor: headlineUrl ? 'pointer' : 'default',
+        position: 'relative',
+      }}
+      onClick={() => {
+        if (headlineUrl) {
+          window.open(headlineUrl, '_blank', 'noopener,noreferrer')
+        }
+      }}
+      onMouseEnter={(e) => {
+        if (headlineUrl) {
+          e.currentTarget.style.background = 'rgba(255,255,255,0.08)'
+          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'
+        }
+        handleMouseEnter()
+      }}
+      onMouseLeave={(e) => {
+        if (headlineUrl) {
+          e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
+          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+        }
+        setShowPreview(false)
+      }}
+    >
+      {/* Thumbnail */}
+      {headlineImage && (
+        <img 
+          src={headlineImage} 
+          alt=""
+          style={{
+            width: '80px',
+            height: '60px',
+            objectFit: 'cover',
+            borderRadius: '6px',
+            flexShrink: 0,
+            border: '1px solid rgba(255,255,255,0.1)',
+          }}
+          onError={(e) => {
+            e.currentTarget.style.display = 'none'
+          }}
+        />
+      )}
+      
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+          <span style={{
+            fontFamily: 'JetBrains Mono',
+            fontSize: '0.6rem',
+            color: '#FFFFFF',
+            flexShrink: 0,
+            marginTop: '2px',
+          }}>
+            {String(index + 1).padStart(2, '0')}
+          </span>
+          <span style={{
+            fontFamily: 'DM Sans',
+            fontSize: '0.82rem',
+            lineHeight: 1.5,
+            color: headlineUrl ? '#FFFFFF' : 'rgba(249,250,251,0.75)',
+            textDecoration: headlineUrl ? 'underline' : 'none',
+            textUnderlineOffset: '2px',
+          }}>
+            {headlineText}
+          </span>
+        </div>
+        {headlineUrl && (
+          <div style={{
+            fontFamily: 'JetBrains Mono',
+            fontSize: '0.55rem',
+            color: '#6B7280',
+            marginLeft: '24px',
+            opacity: 0.7,
+          }}>
+            Click to read →
+          </div>
+        )}
+      </div>
+      
+      {/* Hover Preview */}
+      {showPreview && headlineDescription && (
+        <div style={{
+          position: 'absolute',
+          ...(previewPosition === 'right' 
+            ? { left: '100%', marginLeft: '12px' }
+            : { right: '100%', marginRight: '12px' }
+          ),
+          top: '0',
+          width: '280px',
+          padding: '14px 16px',
+          background: 'rgba(0,0,0,0.95)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,255,255,0.15)',
+          borderRadius: '10px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+          zIndex: 100,
+          pointerEvents: 'none',
+        }}>
+          <div style={{
+            fontFamily: 'DM Sans',
+            fontSize: '0.75rem',
+            lineHeight: 1.6,
+            color: 'rgba(249,250,251,0.9)',
+          }}>
+            {headlineDescription}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function CountryPanel({ data, onClose }) {
   const audioRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -278,75 +420,9 @@ export default function CountryPanel({ data, onClose }) {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {data.headlines && data.headlines.length > 0 ? (
-                data.headlines.map((headline, i) => {
-                  const headlineText = typeof headline === 'string' ? headline : (headline?.title || headline || '')
-                  const headlineUrl = typeof headline === 'object' && headline ? headline.url : null
-                
-                return (
-                  <div key={i} style={{
-                    padding: '14px 16px',
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    borderRadius: '10px',
-                    display: 'flex',
-                    gap: '14px',
-                    alignItems: 'flex-start',
-                    transition: 'all 0.2s ease',
-                    cursor: headlineUrl ? 'pointer' : 'default',
-                  }}
-                  onClick={() => {
-                    if (headlineUrl) {
-                      window.open(headlineUrl, '_blank', 'noopener,noreferrer')
-                    }
-                  }}
-                  onMouseEnter={(e) => {
-                    if (headlineUrl) {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.08)'
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (headlineUrl) {
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
-                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
-                    }
-                  }}
-                  >
-                    <span style={{
-                      fontFamily: 'JetBrains Mono',
-                      fontSize: '0.6rem',
-                      color: '#FFFFFF',
-                      flexShrink: 0,
-                      marginTop: '2px',
-                    }}>
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <div style={{ flex: 1 }}>
-                      <span style={{
-                        fontFamily: 'DM Sans',
-                        fontSize: '0.82rem',
-                        lineHeight: 1.5,
-                        color: headlineUrl ? '#FFFFFF' : 'rgba(249,250,251,0.75)',
-                        textDecoration: headlineUrl ? 'underline' : 'none',
-                        textUnderlineOffset: '2px',
-                      }}>
-                        {headlineText}
-                      </span>
-                      {headlineUrl && (
-                        <div style={{
-                          fontFamily: 'JetBrains Mono',
-                          fontSize: '0.55rem',
-                          color: '#6B7280',
-                          marginTop: '4px',
-                          opacity: 0.7,
-                        }}>
-                          Click to read →
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )
-                })
+                data.headlines.map((headline, i) => (
+                  <ArticlePreview key={i} headline={headline} index={i} />
+                ))
               ) : (
                 <div style={{
                   padding: '14px 16px',

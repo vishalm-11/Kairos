@@ -94,12 +94,18 @@ def _fetch_newsapi(country: str) -> List[Dict[str, str]]:
             # Note: NewsAPI query already filters by country, so we don't need to check again
             # But let's be less strict - only filter out obvious spam/irrelevant
             if not is_irrelevant and len(title) > 10:  # Ensure title is meaningful
-                result.append({
-                    "title": title,
-                    "url": url
-                })
-                if len(result) >= 5:
-                    break
+                # Extract image URL and description
+                image_url = a.get("urlToImage") or None
+                # Only include articles with images
+                if image_url and image_url.startswith("http"):
+                    result.append({
+                        "title": title,
+                        "url": url,
+                        "image": image_url,
+                        "description": description[:200] if description else None  # First 200 chars
+                    })
+                    if len(result) >= 5:
+                        break
         
         print(f"NewsAPI filtered to {len(result)} relevant headlines for {country}")
         
@@ -146,9 +152,18 @@ def _fetch_newsapi(country: str) -> List[Dict[str, str]]:
             if not is_irrelevant:
                 # Check if already added
                 if not any(r["title"].lower() == title.lower() for r in result):
-                    result.append({"title": title, "url": url})
-                    if len(result) >= 5:
-                        break
+                    # Extract image URL and description
+                    image_url = a.get("urlToImage") or None
+                    # Only include articles with images
+                    if image_url and image_url.startswith("http"):
+                        result.append({
+                            "title": title,
+                            "url": url,
+                            "image": image_url,
+                            "description": description[:200] if description else None
+                        })
+                        if len(result) >= 5:
+                            break
         
         print(f"NewsAPI total results after fallback: {len(result)}")
         return result[:5] if result else []
