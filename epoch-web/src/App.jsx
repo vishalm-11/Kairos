@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Globe from './components/Globe'
 import CountryPanel from './components/CountryPanel'
 import LoadingOverlay from './components/LoadingOverlay'
@@ -10,6 +10,17 @@ export default function App() {
   const [selectedCountry, setSelectedCountry] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+
+  // Keep Railway backend alive
+  useEffect(() => {
+    const keepAlive = () => {
+      fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/health`)
+        .catch(() => {}) // silently fail
+    }
+    keepAlive() // ping immediately on load
+    const interval = setInterval(keepAlive, 4 * 60 * 1000) // every 4 minutes
+    return () => clearInterval(interval)
+  }, [])
 
   const handleCountryClick = async (countryName) => {
     if (loading) return
