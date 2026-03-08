@@ -248,7 +248,7 @@ export default function Globe({ onCountryClick }) {
           const countryName = pickedObject.id.name
           const [lat, lng] = COUNTRY_CENTROIDS[countryName]
           viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(lng, lat, 8000000),
+            destination: Cesium.Cartesian3.fromDegrees(lng, lat, 4000000),
             duration: 1.5,
           })
           console.log('Country clicked:', countryName)
@@ -285,7 +285,7 @@ export default function Globe({ onCountryClick }) {
         if (nearest && minDist < 30) {
           const [lat, lng] = COUNTRY_CENTROIDS[nearest]
           viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(lng, lat, 8000000),
+            destination: Cesium.Cartesian3.fromDegrees(lng, lat, 4000000),
             duration: 1.5,
           })
           console.log('Country clicked:', nearest)
@@ -360,7 +360,7 @@ export default function Globe({ onCountryClick }) {
       style={{
         width: '100vw',
         height: '100vh',
-        position: 'absolute',
+        position: 'fixed',
         top: 0,
         left: 0,
         zIndex: 1,
