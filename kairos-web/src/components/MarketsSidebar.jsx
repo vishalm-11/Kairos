@@ -57,13 +57,13 @@ export default function MarketsSidebar({ isOpen, onToggle, onCountryClick }) {
         style={{
           position: 'fixed',
           top: '50%',
-          right: isOpen ? '35%' : 0,
+          right: isOpen ? '25%' : 0,
           transform: 'translateY(-50%)',
           zIndex: 100,
           width: '32px',
           height: '80px',
-          background: 'rgba(3,7,18,0.9)',
-          border: '1px solid #10B981',
+          background: 'rgba(0,0,0,0.85)',
+          border: '1px solid rgba(16,185,129,0.9)',
           borderRight: 'none',
           borderRadius: '8px 0 0 8px',
           cursor: 'pointer',
@@ -82,7 +82,7 @@ export default function MarketsSidebar({ isOpen, onToggle, onCountryClick }) {
           e.currentTarget.style.background = 'rgba(16,185,129,0.15)'
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'rgba(3,7,18,0.9)'
+          e.currentTarget.style.background = 'rgba(0,0,0,0.85)'
         }}
       >
         MARKETS
@@ -93,7 +93,7 @@ export default function MarketsSidebar({ isOpen, onToggle, onCountryClick }) {
         position: 'fixed',
         top: 0,
         right: 0,
-        width: isOpen ? '35%' : 0,
+        width: isOpen ? '25%' : 0,
         height: '100vh',
         overflow: 'hidden',
         transition: 'width 0.3s ease',
@@ -101,19 +101,19 @@ export default function MarketsSidebar({ isOpen, onToggle, onCountryClick }) {
       }}>
         <div style={{
           width: '100%',
-          minWidth: '280px',
+          minWidth: 0,
           height: '100%',
-          background: 'rgba(3,7,18,0.95)',
+          background: 'rgba(0,0,0,0.92)',
           backdropFilter: 'blur(20px)',
-          borderLeft: '1px solid rgba(255,255,255,0.1)',
+          borderLeft: '2px solid rgba(156,163,175,0.35)',
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
         }}>
           {/* Header */}
           <div style={{
-            padding: '28px 24px 20px',
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
+            padding: '22px 16px 16px',
+            borderBottom: '2px solid rgba(156,163,175,0.35)',
             flexShrink: 0,
           }}>
             <div style={{
@@ -121,7 +121,7 @@ export default function MarketsSidebar({ isOpen, onToggle, onCountryClick }) {
               fontSize: '0.75rem',
               color: '#10B981',
               letterSpacing: '0.2em',
-              marginBottom: '16px',
+              marginBottom: '12px',
             }}>
               LIVE MARKETS
             </div>
@@ -135,20 +135,20 @@ export default function MarketsSidebar({ isOpen, onToggle, onCountryClick }) {
               onKeyDown={handleKeyDown}
               style={{
                 width: '100%',
-                padding: '12px 16px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
+                padding: '10px 12px',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
                 borderRadius: '8px',
                 color: '#F9FAFB',
                 fontFamily: 'DM Sans',
-                fontSize: '0.85rem',
+                fontSize: '0.82rem',
                 outline: 'none',
-                marginBottom: '12px',
+                marginBottom: '10px',
               }}
             />
 
             {/* Quick-add chips */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
               {QUICK_ADD_COUNTRIES.map((country) => {
                 const isAdded = addedMarkets[country] !== undefined
                 const isAdding = addingCountry === country
@@ -159,12 +159,13 @@ export default function MarketsSidebar({ isOpen, onToggle, onCountryClick }) {
                     disabled={isAdded || isAdding}
                     style={{
                       padding: '6px 12px',
-                      background: isAdded ? 'rgba(16,185,129,0.2)' : 'rgba(255,255,255,0.05)',
-                      border: `1px solid ${isAdded ? '#10B981' : 'rgba(255,255,255,0.15)'}`,
+                      background: isAdded ? 'rgba(16,185,129,0.18)' : 'rgba(255,255,255,0.04)',
+                      border: `1px solid ${isAdded ? 'rgba(16,185,129,0.9)' : 'rgba(255,255,255,0.10)'}`,
                       borderRadius: '6px',
                       color: isAdded ? '#10B981' : '#9CA3AF',
                       fontFamily: 'DM Sans',
                       fontSize: '0.7rem',
+                      whiteSpace: 'nowrap',
                       cursor: isAdded || isAdding ? 'default' : 'pointer',
                       opacity: isAdding ? 0.6 : 1,
                     }}
@@ -202,75 +203,24 @@ export default function MarketsSidebar({ isOpen, onToggle, onCountryClick }) {
                   <div
                     key={market.country}
                     style={{
-                      padding: '14px 24px',
+                      padding: '12px 16px',
                       borderBottom: '1px solid rgba(255,255,255,0.05)',
                       position: 'relative',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '12px',
+                      transition: 'background 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (hasData) e.currentTarget.style.background = 'rgba(255,255,255,0.035)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent'
                     }}
                   >
-                    <div
-                      onClick={() => hasData && onCountryClick && onCountryClick(market.country)}
-                      style={{
-                        flex: 1,
-                        minWidth: 0,
-                        cursor: hasData ? 'pointer' : 'default',
-                        transition: 'all 0.2s ease',
-                      }}
-                      onMouseEnter={(e) => {
-                        if (hasData) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent'
-                      }}
-                    >
-                      <div style={{
-                        fontFamily: 'DM Sans',
-                        fontSize: '0.85rem',
-                        color: '#F9FAFB',
-                        fontWeight: '500',
-                        marginBottom: '4px',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}>
-                        {market.country}
-                      </div>
-                      <div style={{
-                        fontFamily: 'JetBrains Mono',
-                        fontSize: '0.65rem',
-                        color: '#6B7280',
-                        marginBottom: '6px',
-                      }}>
-                        {market.index_name || 'No index data'}
-                      </div>
-                      <div style={{
-                        fontFamily: 'JetBrains Mono',
-                        fontSize: '0.7rem',
-                        color: '#F9FAFB',
-                      }}>
-                        {market.value || '—'}
-                      </div>
-                      {hasData && (
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          fontFamily: 'JetBrains Mono',
-                          fontSize: '0.7rem',
-                          color: changeColor,
-                          fontWeight: '500',
-                        }}>
-                          <span>{isPositive ? '↑' : '↓'}</span>
-                          <span>{Math.abs(market.change_pct || 0).toFixed(2)}%</span>
-                        </div>
-                      )}
-                    </div>
                     <button
                       onClick={(e) => { e.stopPropagation(); removeMarket(market.country) }}
                       style={{
-                        flexShrink: 0,
+                        position: 'absolute',
+                        top: 10,
+                        right: 10,
                         background: 'transparent',
                         border: 'none',
                         color: '#6B7280',
@@ -285,9 +235,78 @@ export default function MarketsSidebar({ isOpen, onToggle, onCountryClick }) {
                       onMouseLeave={(e) => {
                         e.currentTarget.style.color = '#6B7280'
                       }}
+                      aria-label={`Remove ${market.country}`}
+                      title="Remove"
                     >
                       ✕
                     </button>
+                    <div
+                      onClick={() => hasData && onCountryClick && onCountryClick(market.country)}
+                      style={{
+                        minWidth: 0,
+                        cursor: hasData ? 'pointer' : 'default',
+                        paddingRight: '26px', // space for remove button
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '10px' }}>
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <div style={{
+                            fontFamily: 'DM Sans',
+                            fontSize: '0.82rem',
+                            color: '#F9FAFB',
+                            fontWeight: '500',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}>
+                            {market.country}
+                          </div>
+                          <div style={{
+                            fontFamily: 'JetBrains Mono',
+                            fontSize: '0.6rem',
+                            color: '#9CA3AF',
+                            marginTop: '6px',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}>
+                            {market.index_name || 'No index data'}
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px', flexShrink: 0 }}>
+                          {hasData && (
+                            <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              fontFamily: 'JetBrains Mono',
+                              fontSize: '0.68rem',
+                              color: changeColor,
+                              fontWeight: '600',
+                            }}>
+                              <span>{isPositive ? '↑' : '↓'}</span>
+                              <span>{Math.abs(market.change_pct || 0).toFixed(2)}%</span>
+                            </div>
+                          )}
+                          <div style={{
+                            fontFamily: 'JetBrains Mono',
+                            fontSize: '0.72rem',
+                            color: '#E5E7EB',
+                            textAlign: 'right',
+                          }}>
+                            {market.value || '—'}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{
+                        fontFamily: 'JetBrains Mono',
+                        fontSize: '0.62rem',
+                        color: 'rgba(16,185,129,0.55)',
+                        marginTop: '8px',
+                      }}>
+                        {hasData ? 'Click for briefing →' : ''}
+                      </div>
+                    </div>
                   </div>
                 )
               })

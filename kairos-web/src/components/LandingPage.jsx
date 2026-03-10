@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import ShaderBackground from './ShaderBackground'
+import { ShimmerButton } from './ui/ShimmerButton'
 
 export default function LandingPage({ onEnter }) {
   const [isHovered, setIsHovered] = useState(false)
@@ -15,6 +17,7 @@ export default function LandingPage({ onEnter }) {
       position: 'relative',
       overflow: 'hidden',
     }}>
+      <ShaderBackground />
       {/* Animated background dots */}
       <div style={{
         position: 'absolute',
@@ -23,8 +26,9 @@ export default function LandingPage({ onEnter }) {
         backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
         backgroundSize: '50px 50px',
         animation: 'float 20s ease-in-out infinite',
-        opacity: 0.3,
+        opacity: 0.25,
         pointerEvents: 'none',
+        zIndex: 1,
       }} />
       
       {/* Main content */}
@@ -64,9 +68,9 @@ export default function LandingPage({ onEnter }) {
           fontSize: '1.1rem',
           lineHeight: 1.8,
           color: 'rgba(249,250,251,0.8)',
-          marginBottom: '60px',
+          marginBottom: '40px',
           maxWidth: '600px',
-          margin: '0 auto 60px',
+          margin: '0 auto 40px',
         }}>
           <p style={{ marginBottom: '20px' }}>
             Real-time global news intelligence for stock market analysis. 
@@ -84,44 +88,31 @@ export default function LandingPage({ onEnter }) {
         </div>
         
         {/* CTA Button */}
-        <button
-          onClick={onEnter}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-          style={{
-            fontFamily: 'JetBrains Mono',
-            fontSize: '0.9rem',
-            letterSpacing: '0.2em',
-            color: '#000000',
-            background: isHovered ? '#FFFFFF' : 'rgba(255,255,255,0.9)',
-            border: '2px solid #FFFFFF',
-            padding: '16px 48px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: isHovered 
-              ? '0 0 30px rgba(255,255,255,0.4), 0 8px 16px rgba(0,0,0,0.3)'
-              : '0 4px 12px rgba(0,0,0,0.2)',
-            transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
-            fontWeight: '600',
-          }}
-        >
-          ENTER GLOBE →
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <ShimmerButton
+            onClick={onEnter}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            shimmerColor="#059669"
+            shimmerDuration="3.2s"
+            shimmerSize="0.06em"
+            background="rgba(3,7,18,0.95)"
+            borderRadius="999px"
+          >
+            <span
+              style={{
+                fontFamily: 'JetBrains Mono',
+                fontSize: '0.9rem',
+                letterSpacing: '0.2em',
+                fontWeight: 600,
+              }}
+            >
+              ENTER GLOBE →
+            </span>
+          </ShimmerButton>
+        </div>
       </div>
       
-      {/* Footer hint */}
-      <div style={{
-        position: 'absolute',
-        bottom: '40px',
-        fontFamily: 'JetBrains Mono',
-        fontSize: '0.65rem',
-        color: '#6B7280',
-        letterSpacing: '0.15em',
-        opacity: 0.6,
-      }}>
-        Click any country marker to begin
-      </div>
     </div>
   )
 }

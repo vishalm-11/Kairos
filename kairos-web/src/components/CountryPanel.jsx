@@ -174,7 +174,7 @@ const Sparkline = ({ data, color = '#10B981', width = 120, height = 30 }) => {
   )
 }
 
-export default function CountryPanel({ data, onClose, globeWidth = '65%' }) {
+export default function CountryPanel({ data, onClose, globeWidth = '75%' }) {
   const audioRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
 

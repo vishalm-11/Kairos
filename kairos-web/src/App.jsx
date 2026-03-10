@@ -50,7 +50,7 @@ export default function App() {
     return <LandingPage onEnter={() => setShowGlobe(true)} />
   }
 
-  const globeWidth = sidebarOpen ? '65%' : '100%'
+  const globeWidth = sidebarOpen ? '75%' : '100%'
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', background: '#030712', display: 'flex' }}>

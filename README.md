@@ -14,13 +14,13 @@ A real-time global news intelligence platform for stock market analysis. World e
 ### 2. Backend Setup
 
 ```bash
-cd epoch-api
+cd kairos-api
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Create `epoch-api/.env` file with your API keys:
+Create `kairos-api/.env` file with your API keys:
 
 ```
 GEMINI_API_KEY=your_gemini_api_key_here
@@ -37,11 +37,11 @@ uvicorn main:app --reload --port 8000
 ### 3. Frontend Setup
 
 ```bash
-cd epoch-web
+cd kairos-web
 npm install
 ```
 
-Create `epoch-web/.env` file with your Cesium token:
+Create `kairos-web/.env` file with your Cesium token:
 
 ```
 VITE_CESIUM_TOKEN=your_cesium_ion_token_here
@@ -63,11 +63,11 @@ Click any country on the globe to see real-time news summaries and hear them rea
 
 ```
 Kairos/
-├── epoch-api/          # FastAPI backend
+├── kairos-api/          # FastAPI backend
 │   ├── main.py         # FastAPI app entry point
 │   ├── routers/        # API route handlers
 │   └── services/       # News, Gemini, ElevenLabs, Economics services
-└── epoch-web/          # React + Vite frontend
+└── kairos-web/          # React + Vite frontend
     ├── src/
     │   ├── components/ # React components (Globe, CountryPanel, MarketsSidebar, etc.)
     │   └── lib/        # API client

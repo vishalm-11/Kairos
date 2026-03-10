@@ -6,7 +6,7 @@ import os
 
 load_dotenv()
 
-app = FastAPI(title="Epoch API")
+app = FastAPI(title="Kairos API")
 
 app.add_middleware(
     CORSMiddleware,
