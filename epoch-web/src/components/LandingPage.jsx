@@ -44,7 +44,7 @@ export default function LandingPage({ onEnter }) {
           textShadow: '0 0 30px rgba(255,255,255,0.3)',
           lineHeight: 1,
         }}>
-          EPOCH
+          KAIROS
         </div>
         
         {/* Subtitle */}
@@ -55,7 +55,7 @@ export default function LandingPage({ onEnter }) {
           letterSpacing: '0.3em',
           marginBottom: '40px',
         }}>
-          WORLD EVENTS IN REAL TIME
+          GLOBAL NEWS INTELLIGENCE
         </div>
         
         {/* Description */}
@@ -69,16 +69,17 @@ export default function LandingPage({ onEnter }) {
           margin: '0 auto 60px',
         }}>
           <p style={{ marginBottom: '20px' }}>
-            Explore global news and crisis events through an interactive 3D globe. 
-            Click any country to receive AI-powered news summaries read aloud by 
-            an AI news anchor, with real-time headlines from around the world.
+            Real-time global news intelligence for stock market analysis. 
+            World events move markets, and Kairos makes that connection visible. 
+            Click any country to see how news is driving financial markets with 
+            AI-powered analysis and live market data.
           </p>
           <p style={{ 
             fontSize: '0.95rem',
             color: 'rgba(249,250,251,0.6)',
             fontStyle: 'italic',
           }}>
-            Focused on conflicts, diplomacy, foreign affairs, and world issues.
+            Connecting global events to market movements in real time.
           </p>
         </div>
         

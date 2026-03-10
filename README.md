@@ -1,6 +1,6 @@
-# Epoch — World Events in Real Time
+# Kairos — Global News Intelligence
 
-An interactive 3D globe that shows real-time global news and crisis events. Click any country on the globe to get a Gemini-powered news summary read aloud by ElevenLabs, with headlines displayed in a sleek side panel.
+A real-time global news intelligence platform for stock market analysis. World events move markets, and Kairos makes that connection visible. Explore an interactive 3D globe with a live markets dashboard, AI-powered news analysis, and real-time financial data.
 
 ## Setup
 
@@ -62,14 +62,14 @@ Click any country on the globe to see real-time news summaries and hear them rea
 ## Project Structure
 
 ```
-epoch/
+Kairos/
 ├── epoch-api/          # FastAPI backend
 │   ├── main.py         # FastAPI app entry point
 │   ├── routers/        # API route handlers
-│   └── services/       # News, Gemini, ElevenLabs services
+│   └── services/       # News, Gemini, ElevenLabs, Economics services
 └── epoch-web/          # React + Vite frontend
     ├── src/
-    │   ├── components/ # React components (Globe, CountryPanel, etc.)
+    │   ├── components/ # React components (Globe, CountryPanel, MarketsSidebar, etc.)
     │   └── lib/        # API client
     └── index.html      # HTML entry point
 ```
@@ -77,10 +77,13 @@ epoch/
 ## Features
 
 - **Interactive 3D Globe**: Powered by CesiumJS with 50+ clickable countries
+- **Live Markets Dashboard**: Persistent sidebar showing real-time stock index data for all tracked countries
+- **Market Intelligence**: Sparkline charts, top affected stocks, and market briefs
 - **Real-time News**: Fetches latest headlines from NewsAPI with GDELT fallback
-- **AI Summarization**: Gemini 2.0 Flash generates natural news anchor summaries
+- **AI Market Analysis**: Gemini 2.0 Flash generates financial news anchor summaries connecting events to markets
 - **Text-to-Speech**: ElevenLabs provides realistic voice narration
-- **Modern UI**: Sleek dark theme with smooth animations
+- **Sentiment Analysis**: News sentiment scoring and related country connections
+- **Modern UI**: Sleek dark theme with emerald green accents
 
 ## Technology Stack
 

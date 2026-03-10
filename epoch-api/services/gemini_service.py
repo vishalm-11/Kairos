@@ -31,14 +31,11 @@ def summarize_news(country: str, headlines: list, economics: dict = None) -> str
         if economics.get("stock") and economics["stock"].get("formatted"):
             economics_text += f"\nMarkets: {economics['stock']['formatted']}"
     
-    prompt = f"""You are a live international news anchor delivering a real-time briefing.
-Your job is to summarize what is happening in {country} right now — focus on geopolitical events, conflicts, diplomacy, social movements, natural disasters, and major national developments.
-Only mention economic or market data if it directly relates to a major news event — do not lead with it or make it the focus.
-Speak in 3-4 sentences, naturally, as if live on air. No bullet points, no markdown, plain spoken text only.
+    prompt = f"""You are a financial news anchor on a live markets broadcast. In 3-4 sentences, explain what is happening in {country} and how it is affecting or likely to affect their financial markets and key stocks. Reference the index performance if available. Be specific, analytical, and speak as if live on air. No bullet points, no markdown, plain spoken text only.
 
 Headlines:
 {headlines_text}
-{f"Economic Context (reference only if directly relevant): {economics_text}" if economics_text else ""}"""
+{f"Economic Context: {economics_text}" if economics_text else ""}"""
 
     # Try different API versions and model names
     models_to_try = [

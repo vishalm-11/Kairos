@@ -1,6 +1,9 @@
 import os
 import requests
 import yfinance as yf
+import json
+import re
+from google import genai
 
 # Map country names to their currency code and major stock index ticker
 COUNTRY_ECONOMIC_DATA = {
@@ -172,7 +175,7 @@ def get_stock_fallback(ticker: str, index_name: str) -> dict:
         return None
 
 def get_stock_index(ticker: str, index_name: str) -> dict:
-    """Get today's stock index performance."""
+    """Get today's stock index performance with sparkline data."""
     if not ticker:
         print(f"No ticker provided for stock index")
         return None
@@ -180,7 +183,7 @@ def get_stock_index(ticker: str, index_name: str) -> dict:
     # Try yfinance first
     try:
         stock = yf.Ticker(ticker)
-        hist = stock.history(period="2d")
+        hist = stock.history(period="5d")
         print(f"yfinance returned {len(hist)} days of data for {ticker}")
         if hist.empty:
             print(f"No data returned for ticker {ticker}, trying fallback")
@@ -189,16 +192,21 @@ def get_stock_index(ticker: str, index_name: str) -> dict:
             # If only one day of data, try fallback
             print(f"Only one day of data for {ticker}, trying fallback")
             return get_stock_fallback(ticker, index_name)
-        prev_close = hist['Close'].iloc[-2]
+        prev_close = hist['Close'].iloc[-2] if len(hist) >= 2 else hist['Close'].iloc[-1]
         current = hist['Close'].iloc[-1]
         change_pct = ((current - prev_close) / prev_close) * 100
         arrow = "↑" if change_pct >= 0 else "↓"
+        
+        # Get sparkline data (last 5 days)
+        sparkline = hist['Close'].tail(5).tolist()
+        
         return {
             "index_name": index_name,
             "value": f"{current:,.2f}",
             "change_pct": round(change_pct, 2),
             "formatted": f"{index_name} {current:,.2f} {arrow} {abs(change_pct):.2f}%",
-            "direction": "up" if change_pct >= 0 else "down"
+            "direction": "up" if change_pct >= 0 else "down",
+            "sparkline": sparkline
         }
     except Exception as e:
         print(f"Stock index error for {ticker}: {e}")
@@ -207,6 +215,78 @@ def get_stock_index(ticker: str, index_name: str) -> dict:
         # Try fallback if yfinance fails
         print(f"Trying fallback API for {ticker}")
         return get_stock_fallback(ticker, index_name)
+
+def get_top_stocks(country: str, headlines: list) -> list:
+    """Get top 3 stocks most relevant to country's current news."""
+    try:
+        # Step 1: Ask Gemini which tickers are most relevant
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            print("GEMINI_API_KEY not set, cannot fetch top stocks")
+            return []
+        
+        client = genai.Client(api_key=api_key, http_options={"api_version": "v1"})
+        
+        # Extract headline titles
+        if headlines and isinstance(headlines[0], dict):
+            headline_titles = [h.get("title", "") for h in headlines if h.get("title")]
+        else:
+            headline_titles = [h for h in headlines if isinstance(h, str)]
+        
+        if not headline_titles:
+            return []
+        
+        # Limit headlines to first 5 to speed up Gemini call
+        headlines_text = "\n".join(f"- {h}" for h in headline_titles[:5])
+        prompt = f"""Based on these news headlines about {country}, identify 3 publicly traded stock tickers on major exchanges (NYSE, NASDAQ, LSE, TSE, etc.) most likely to be affected by these events.
+Return ONLY a JSON array of objects with ticker and company_name fields.
+Example: [{{"ticker": "XOM", "company_name": "ExxonMobil"}}, ...]
+Headlines: {headlines_text}
+Return only tickers that are real and actively traded. No markdown."""
+
+        try:
+            response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+            text = response.text.strip().replace("```json", "").replace("```", "").strip()
+            match = re.search(r'\[.*?\]', text, re.DOTALL)
+            stocks_meta = json.loads(match.group()) if match else []
+        except Exception as e:
+            print(f"Error parsing Gemini response for top stocks: {e}")
+            return []
+
+        # Step 2: Fetch prices (with timeout protection)
+        results = []
+        for stock in stocks_meta[:3]:
+            try:
+                ticker = stock.get("ticker", "")
+                if not ticker:
+                    continue
+                # Use shorter period for faster fetching
+                t = yf.Ticker(ticker)
+                hist = t.history(period="2d")
+                if len(hist) < 1:
+                    continue
+                current = hist['Close'].iloc[-1]
+                prev = hist['Close'].iloc[-2] if len(hist) >= 2 else current
+                change_pct = ((current - prev) / prev) * 100
+                results.append({
+                    "ticker": ticker,
+                    "company_name": stock.get("company_name", ticker),
+                    "price": round(current, 2),
+                    "change_pct": round(change_pct, 2),
+                    "direction": "up" if change_pct >= 0 else "down"
+                })
+                # Stop if we have 3 stocks (don't wait for all)
+                if len(results) >= 3:
+                    break
+            except Exception as e:
+                print(f"Error fetching stock data for {stock.get('ticker', 'unknown')}: {e}")
+                continue
+        return results
+    except Exception as e:
+        print(f"Error in get_top_stocks: {e}")
+        import traceback
+        print(traceback.format_exc())
+        return []
 
 def get_economic_pulse(country: str) -> dict:
     """Get full economic pulse for a country."""

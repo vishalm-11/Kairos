@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from services.news_service import fetch_news
-from services.gemini_service import summarize_news
+from services.gemini_service import summarize_news, get_sentiment, get_related_countries
 from services.elevenlabs_service import speak
-from services.economics_service import get_economic_pulse
+from services.economics_service import get_economic_pulse, get_top_stocks, get_stock_index, COUNTRY_ECONOMIC_DATA
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 
@@ -40,30 +40,6 @@ async def get_country_data(country_name: str):
             headline_titles = [f"Recent news about {country_name}"]
             print(f"WARNING: No valid headlines for summary, using default")
         
-        # Run Gemini and ElevenLabs in parallel for speed
-        loop = asyncio.get_event_loop()
-        
-        # Generate summary (can take a few seconds) - now includes economics
-        summary_future = loop.run_in_executor(
-            executor, 
-            summarize_news, 
-            country_name, 
-            headline_titles,
-            economics
-        )
-        
-        # Wait for summary, then generate audio
-        summary = await summary_future
-        print(f"Summary generated: {len(summary)} characters")
-        
-        # Generate audio (can take a few seconds)
-        audio_base64 = await loop.run_in_executor(
-            executor,
-            speak,
-            summary
-        )
-        print(f"Audio generated: {len(audio_base64)} characters")
-        
         # Ensure headlines is always a list and filter out fallback messages
         if not headlines:
             headlines = []
@@ -78,15 +54,96 @@ async def get_country_data(country_name: str):
         else:
             print(f"  WARNING: No valid headlines to return!")
         
+        # Run all async operations in parallel for maximum speed
+        loop = asyncio.get_event_loop()
+        
+        # Start all operations in parallel
+        summary_future = loop.run_in_executor(
+            executor, 
+            summarize_news, 
+            country_name, 
+            headline_titles,
+            economics
+        )
+        top_stocks_future = loop.run_in_executor(executor, get_top_stocks, country_name, headlines)
+        sentiment_future = loop.run_in_executor(executor, get_sentiment, country_name, headlines)
+        related_countries_future = loop.run_in_executor(executor, get_related_countries, country_name, headlines)
+        
+        # Wait for summary first (needed for audio)
+        summary = await summary_future
+        print(f"Summary generated: {len(summary)} characters")
+        
+        # Generate audio while other operations complete
+        audio_future = loop.run_in_executor(executor, speak, summary)
+        
+        # Wait for all remaining operations
+        audio_base64, top_stocks, sentiment, related_countries = await asyncio.gather(
+            audio_future,
+            top_stocks_future,
+            sentiment_future,
+            related_countries_future,
+            return_exceptions=True
+        )
+        
+        print(f"Audio generated: {len(audio_base64) if not isinstance(audio_base64, Exception) else 0} characters")
+        
+        # Handle exceptions - do not silently swallow ElevenLabs errors
+        if isinstance(audio_base64, Exception):
+            print(f"Error generating audio: {audio_base64}")
+            raise HTTPException(
+                status_code=502,
+                detail=f"Audio generation failed: {str(audio_base64)}"
+            )
+        if isinstance(top_stocks, Exception):
+            print(f"Error fetching top stocks: {top_stocks}")
+            top_stocks = []
+        if isinstance(sentiment, Exception):
+            print(f"Error fetching sentiment: {sentiment}")
+            sentiment = {"score": 5, "label": "Neutral", "reasoning": "Unable to determine sentiment."}
+        if isinstance(related_countries, Exception):
+            print(f"Error fetching related countries: {related_countries}")
+            related_countries = []
+        
+        print(f"Top stocks fetched: {len(top_stocks)} stocks")
+        print(f"Sentiment: {sentiment}")
+        print(f"Related countries: {related_countries}")
+        
         return {
             "country": country_name,
             "headlines": headlines,  # Now includes URLs
             "summary": summary,
             "audio_base64": audio_base64,
             "economics": economics,
+            "top_stocks": top_stocks,
+            "sentiment": sentiment,
+            "related_countries": related_countries,
         }
+    except HTTPException:
+        raise
     except Exception as e:
         import traceback
         error_details = traceback.format_exc()
         print(f"Error processing {country_name}: {error_details}")
         raise HTTPException(status_code=500, detail=f"Error processing {country_name}: {str(e)}")
+
+@router.get("/markets")
+async def get_all_markets(countries: str | None = None):
+    """Get current index data. If countries param provided (comma-separated), fetch only those. Otherwise return all."""
+    if countries:
+        country_list = [c.strip() for c in countries.split(",") if c.strip()]
+    else:
+        country_list = list(COUNTRY_ECONOMIC_DATA.keys())
+    
+    results = {}
+    for country in country_list:
+        meta = COUNTRY_ECONOMIC_DATA.get(country)
+        if not meta or not meta.get("index"):
+            results[country] = None
+            continue
+        try:
+            stock = get_stock_index(meta["index"], meta["index_name"])
+            results[country] = stock
+        except Exception as e:
+            print(f"Error fetching market data for {country}: {e}")
+            results[country] = None
+    return results

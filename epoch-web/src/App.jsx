@@ -3,6 +3,7 @@ import Globe from './components/Globe'
 import CountryPanel from './components/CountryPanel'
 import LoadingOverlay from './components/LoadingOverlay'
 import LandingPage from './components/LandingPage'
+import MarketsSidebar from './components/MarketsSidebar'
 import { getCountryData } from './lib/api'
 
 export default function App() {
@@ -10,6 +11,7 @@ export default function App() {
   const [selectedCountry, setSelectedCountry] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Keep Railway backend alive
   useEffect(() => {
@@ -48,22 +50,25 @@ export default function App() {
     return <LandingPage onEnter={() => setShowGlobe(true)} />
   }
 
+  const globeWidth = sidebarOpen ? '65%' : '100%'
+
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative', background: '#030712' }}>
-      {/* Top bar */}
+    <div style={{ width: '100vw', height: '100vh', position: 'relative', background: '#030712', display: 'flex' }}>
+      {/* Top bar - spans globe area only */}
       <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
+        position: 'absolute', top: 0, left: 0, width: globeWidth, zIndex: 10,
         padding: '20px 28px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         background: 'linear-gradient(to bottom, rgba(3,7,18,0.9) 0%, transparent 100%)',
-        pointerEvents: 'none'
+        pointerEvents: 'none',
+        transition: 'width 0.3s ease',
       }}>
         <div>
           <div style={{ fontFamily: 'Bebas Neue', fontSize: '2rem', letterSpacing: '0.1em', color: '#FFFFFF' }}>
-            EPOCH
+            KAIROS
           </div>
           <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: '#6B7280', letterSpacing: '0.2em', marginTop: '-4px' }}>
-            WORLD EVENTS IN REAL TIME
+            GLOBAL NEWS INTELLIGENCE
           </div>
         </div>
         <div style={{ fontFamily: 'JetBrains Mono', fontSize: '0.65rem', color: '#6B7280', letterSpacing: '0.15em' }}>
@@ -71,15 +76,23 @@ export default function App() {
         </div>
       </div>
 
-      {/* Globe */}
-      <Globe onCountryClick={handleCountryClick} />
+      {/* Globe container - includes globe + loading overlay (centered relative to globe only) */}
+      <div style={{
+        width: globeWidth,
+        height: '100vh',
+        position: 'relative',
+        transition: 'width 0.3s ease',
+      }}>
+        <Globe onCountryClick={handleCountryClick} />
+        {loading && <LoadingOverlay />}
+      </div>
 
-      {/* Loading */}
-      {loading && (
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 15 }}>
-          <LoadingOverlay />
-        </div>
-      )}
+      {/* Markets Sidebar - togglable */}
+      <MarketsSidebar
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(o => !o)}
+        onCountryClick={handleCountryClick}
+      />
 
       {/* Error */}
       {error && (
@@ -93,11 +106,12 @@ export default function App() {
         </div>
       )}
 
-      {/* Country Panel */}
+      {/* Country Panel - slides over globe only, not sidebar */}
       {selectedCountry && (
         <CountryPanel
           data={selectedCountry}
           onClose={() => setSelectedCountry(null)}
+          globeWidth={globeWidth}
         />
       )}
     </div>

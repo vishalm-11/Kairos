@@ -2,7 +2,7 @@ import os
 import base64
 import requests
 
-VOICE_ID = "21m00Tcm4TlvDq8ikWAM"  # Rachel
+VOICE_ID = "onwK4e9ZLuTAKqWW03F9"
 
 def speak(text: str) -> str:
     api_key = os.getenv("ELEVENLABS_API_KEY")
@@ -11,6 +11,8 @@ def speak(text: str) -> str:
     
     if not text or len(text.strip()) == 0:
         raise ValueError("Cannot generate audio for empty text")
+    
+    print(f"[ElevenLabs] Key: {os.getenv('ELEVENLABS_API_KEY', 'NOT SET')[:12]}...")
     
     try:
         response = requests.post(
@@ -22,7 +24,7 @@ def speak(text: str) -> str:
             },
             json={
                 "text": text,
-                "model_id": "eleven_monolingual_v1",
+                "model_id": "eleven_turbo_v2_5",
                 "voice_settings": {
                     "stability": 0.5,
                     "similarity_boost": 0.75
@@ -30,6 +32,9 @@ def speak(text: str) -> str:
             },
             timeout=30
         )
+        
+        print(f"[ElevenLabs] Response status: {response.status_code}")
+        print(f"[ElevenLabs] Response body: {response.text[:200]}")
         
         response.raise_for_status()
         
